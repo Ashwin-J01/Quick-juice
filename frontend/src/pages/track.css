@@ -1,0 +1,9 @@
+.track-page {
+  padding: 2rem 0;
+}
+.track-page .card {
+  padding: 1.5rem;
+}
+.track-page .order-history .card {
+  cursor: pointer;
+}
