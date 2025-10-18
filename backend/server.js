@@ -31,7 +31,13 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/quickjuic
 app.get('/', (req, res) => {
   res.json({ message: 'QuickJuice API is running!' });
 });
+// Only start the server when this file is run directly (node server.js).
+// When required as a module (for example by a serverless wrapper) do not call listen()
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+  });
+}
 
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
+// Export the Express app so serverless platforms (or tests) can import it
+module.exports = app;
