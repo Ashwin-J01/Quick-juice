@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <!-- Background circle -->
+  <circle cx="100" cy="100" r="95" fill="#FF6B35" opacity="0.1" stroke="#FF6B35" stroke-width="2"/>
+  
+  <!-- Juice glass -->
+  <g id="glass">
+    <!-- Glass outline -->
+    <path d="M 70 60 L 75 140 Q 75 150 85 150 L 115 150 Q 125 150 125 140 L 130 60 Z" 
+          fill="none" stroke="#FF6B35" stroke-width="2.5" stroke-linejoin="round"/>
+    
+    <!-- Juice inside glass -->
+    <path d="M 75 120 Q 75 130 85 130 L 115 130 Q 125 130 125 120 Z" 
+          fill="#FF6B35" opacity="0.7"/>
+    
+    <!-- Juice wave -->
+    <path d="M 75 120 Q 85 115 100 120 T 125 120" 
+          fill="none" stroke="#FF6B35" stroke-width="1.5" opacity="0.5"/>
+  </g>
+  
+  <!-- Straw -->
+  <g id="straw">
+    <line x1="100" y1="40" x2="95" y2="125" stroke="#FF6B35" stroke-width="3" stroke-linecap="round"/>
+    <circle cx="95" cy="125" r="2" fill="#FF6B35"/>
+  </g>
+  
+  <!-- Text -->
+  <text x="100" y="170" font-family="Arial, sans-serif" font-size="14" font-weight="bold" 
+        text-anchor="middle" fill="#FF6B35">QuickJuice</text>
+</svg>
