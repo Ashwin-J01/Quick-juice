@@ -19,13 +19,31 @@ app.use('/api/admin', require('./routes/admin'));
 app.use('/api/juices', require('./routes/juices'));
 app.use('/api/orders', require('./routes/orders'));
 
-// MongoDB connection
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/quickjuice', {
+// MongoDB connection with caching (helps in serverless environments like Vercel)
+const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/quickjuice';
+const mongooseOptions = {
   useNewUrlParser: true,
   useUnifiedTopology: true,
-})
-.then(() => console.log('Connected to MongoDB'))
-.catch(err => console.error('MongoDB connection error:', err));
+};
+
+function connectToMongo() {
+  if (global.__mongoConnectPromise) {
+    return global.__mongoConnectPromise;
+  }
+  global.__mongoConnectPromise = mongoose.connect(mongoUri, mongooseOptions)
+    .then(() => console.log('Connected to MongoDB'))
+    .catch(err => {
+      console.error('MongoDB connection error:', err);
+      // clear the promise so future attempts can retry
+      delete global.__mongoConnectPromise;
+      throw err;
+    });
+  return global.__mongoConnectPromise;
+}
+
+// Kick off initial connection (cold-start). For serverless platforms, the connection
+// will be reused if the instance remains warm.
+connectToMongo().catch(() => {});
 
 // Basic route
 app.get('/', (req, res) => {

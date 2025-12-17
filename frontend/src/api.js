@@ -1,13 +1,6 @@
 import axios from 'axios'
 
-// --- MODIFICATION ---
-// This line now automatically switches the URL.
-// In development (npm run dev): 'http://localhost:5000/api'
-// In production (Vercel build): '/api'
-const API_BASE_URL = import.meta.env.PROD 
-  ? '/api' 
-  : 'http://localhost:5000/api'
-// --- END MODIFICATION ---
+const API_BASE_URL = 'http://localhost:5000/api'
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -94,10 +87,8 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Clear token and redirect to login
       localStorage.removeItem('token')
-      // You might also want to clear user from AuthContext here
-      window.location.href = '/login' 
+      window.location.href = '/login'
     }
     return Promise.reject(error)
   }
