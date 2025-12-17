@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { getImageUrl } from '../utils/image'
 
 const SmartImage = ({ src, alt = '', style = {}, className = '', ...rest }) => {
   const [index, setIndex] = useState(0)
@@ -6,52 +7,45 @@ const SmartImage = ({ src, alt = '', style = {}, className = '', ...rest }) => {
   const placeholder = '/placeholder-juice.svg'
 
   useEffect(() => {
-  const imgs = []
-  const envBase = import.meta?.env?.VITE_API_BASE || ''
-  const fallbacks = [envBase, 'http://localhost:5000', 'http://127.0.0.1:5000'].filter(Boolean)
-
+    const imgs = []
+    
     if (!src || typeof src !== 'string') {
       imgs.push(placeholder)
     } else {
-      // If absolute URL
-      if (src.startsWith('http')) imgs.push(src)
-
-      // If src starts with a leading slash, prefer backend-host uploads first
+      // If already a full URL, use it directly
+      if (src.startsWith('http://') || src.startsWith('https://')) {
+        imgs.push(src)
+      } else {
+        // Use the getImageUrl helper to construct the full URL
+        const fullUrl = getImageUrl(src)
+        imgs.push(fullUrl)
+      }
+      
+      // Fallback candidates for local development
       if (src.startsWith('/')) {
         const basename = src.replace(/^\/+/, '')
-        // try backend /uploads/<basename> first
-        fallbacks.forEach(base => imgs.push(`${base}/uploads/${basename}`))
-        // then try backend + original path
-        fallbacks.forEach(base => imgs.push(`${base}${src}`))
-        // then try local public/relative uploads and finally the raw src
         imgs.push(`/public/uploads/${basename}`)
         imgs.push(`/uploads/${basename}`)
         imgs.push(src)
-      } else {
-        // filename-like: try several upload locations and backend hosts
-        // 1) backend-host /uploads/<file>
-        fallbacks.forEach(base => imgs.push(`${base}/uploads/${src}`))
-        // 2) try local dev server public uploads and relative uploads
+      } else if (!src.startsWith('http')) {
         imgs.push(`/public/uploads/${src}`)
         imgs.push(`/uploads/${src}`)
         imgs.push(`./uploads/${src}`)
       }
-
-      // raw src as last attempt, then placeholder
-      imgs.push(src)
+      
       imgs.push(placeholder)
     }
 
     setCandidates(imgs)
     setIndex(0)
+    
     if (import.meta.env.DEV) {
-      // eslint-disable-next-line no-console
       console.debug('[SmartImage] candidates for', src, imgs)
     }
   }, [src])
 
   const handleError = (e) => {
-    // try next candidate
+    // Try next candidate
     setIndex(i => {
       const next = i + 1
       if (next >= candidates.length) return i

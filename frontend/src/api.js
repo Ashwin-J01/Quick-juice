@@ -1,6 +1,11 @@
 import axios from 'axios'
 
-const API_BASE_URL = 'http://localhost:5000/api'
+/**
+ * Get API base URL from environment variable or use local development URL
+ * Production: VITE_API_URL should be set to https://quick-juice.onrender.com/api
+ * Development: defaults to http://localhost:5000/api
+ */
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -8,6 +13,11 @@ const api = axios.create({
     'Content-Type': 'application/json',
   },
 })
+
+// Log API base URL in development for debugging
+if (import.meta.env.DEV) {
+  console.debug('[API] Base URL:', API_BASE_URL)
+}
 
 // Juices API
 export const juicesAPI = {

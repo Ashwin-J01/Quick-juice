@@ -1,29 +1,37 @@
+/**
+ * Constructs the full image URL for use in the frontend
+ * Handles both relative paths and absolute URLs from the backend
+ * 
+ * @param {string} imagePath - The image path from the backend (e.g., 'juice-1.jpg', '/uploads/juice-1.jpg', or full URL)
+ * @returns {string} - The full image URL or a placeholder
+ * 
+ * Development: Uses http://localhost:5000 as backend
+ * Production: Uses environment variable VITE_API_URL or Render backend URL
+ */
 export const getImageUrl = (imagePath) => {
-  const envBase = import.meta?.env?.VITE_API_BASE || ''
-  const fallbacks = [envBase, 'http://localhost:5000', 'http://127.0.0.1:5000'].filter(Boolean)
   const placeholder = '/placeholder-juice.svg'
-
-  if (!imagePath) return placeholder
-  if (typeof imagePath !== 'string') return placeholder
-  if (imagePath.startsWith('http')) return imagePath
-
-  const candidates = []
-  // If path is already an absolute-path like /uploads/...
-  if (imagePath.startsWith('/')) {
-    // try the path as-is first (maybe served by Vite/public)
-    candidates.push(imagePath)
-    // then try backend hosts
-    fallbacks.forEach(base => candidates.push(`${base}${imagePath}`))
-  } else {
-    // filename only - try backend-host /uploads, public/uploads and relative uploads
-    fallbacks.forEach(base => candidates.push(`${base}/uploads/${imagePath}`))
-    candidates.push(`/public/uploads/${imagePath}`)
-    candidates.push(`/uploads/${imagePath}`)
-    candidates.push(`./uploads/${imagePath}`)
+  
+  // Return placeholder for missing or invalid paths
+  if (!imagePath || typeof imagePath !== 'string') {
+    return placeholder
   }
-
-  // return first candidate; callers/components can use SmartImage which will try multiple
-  return candidates[0] || placeholder
+  
+  // If already a full URL, return as-is
+  if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+    return imagePath
+  }
+  
+  // Get backend base URL from environment or use development default
+  const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
+  const backendUrl = apiBaseUrl.replace(/\/api\/?$/, '') // Remove /api suffix to get base URL
+  
+  // Ensure imagePath starts with /uploads for consistency
+  const normalizedPath = imagePath.startsWith('/') 
+    ? imagePath 
+    : `/uploads/${imagePath}`
+  
+  // Return full URL with backend base URL
+  return `${backendUrl}${normalizedPath}`
 }
 
 export default getImageUrl
