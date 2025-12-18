@@ -12,9 +12,10 @@ const allowedOrigins = [
   'http://localhost:5173',
   'http://127.0.0.1:3000',
   'http://127.0.0.1:5173',
-  'https://quick-juice-mbe4hakta-ashwins-projects-a1947f1d.vercel.app', // Production Vercel frontend
-  process.env.FRONTEND_URL || '', // Additional dynamic frontend URL support
+  'https://quick-juice-two.vercel.app', // ✅ CURRENT frontend
+  process.env.FRONTEND_URL || '',
 ].filter(Boolean);
+
 
 const corsOptions = {
   origin: (origin, callback) => {
